@@ -1,89 +1,58 @@
 import numpy as np
-import heapq
-import copy 
-import timeit
-from utils import expand_node, hash_state, Tree
-from utils import misplaced_tile_dist
+from search import general_search
 
-def general_search(init_state, method):
-    assert method in {0,1,2}
-    
-    # The queue for nodes is implemented by queue
-    node_heap = []
-    # Track the explored states to avoid repeated states
-    explored_states = set()
-    # Push the initial node to the queue 
-    init_node = Tree(init_state,method)
-    heapq.heappush(node_heap, init_node)
-    explored_states.add(hash_state(init_state))
-    # Save the number of expanded nodes and maximum length of queue
-    i = 0
-    max_queue_len = 0
-    while(1):
-        i += 1
-        if len(node_heap) > max_queue_len: max_queue_len = len(node_heap)
-        
-        if len(node_heap) == 0:
-            print("FAILURE!")
-            return -1
-        # Pop up the node with mimimum cost
-        min_node = heapq.heappop(node_heap)
-        # Print out details about this node
-        print("g(n) = {} , h(n) = {}, f(n) = {}".format(min_node.g_n, min_node.h_n, min_node.g_n + min_node.h_n))
+def check_puzzle_array(puzzle_array):
+    if puzzle_array.shape[0] != 9:
+        print("Please input exactly 9 numbers, your input contains only {} numbers".format(puzzle_array.shape[0]))
+        return -1
+    if any(puzzle_array>8):
+        print("Please don't input any number larger than 8")
+        return -1
+    if any(puzzle_array<0):
+        print("Please don't input any number smaller than 0")
+        return -1
+    if len(set(puzzle_array)) <9:
+        print("Your input contains repeated numbers")
+        return -1
+    return 1
 
-        # Judge if all numbers are in the correct position
-        if misplaced_tile_dist(min_node.state) == 0:
-            print(i)
-            print("FOUND!")
-            # Track all the actions and history states taken so far 
-            action_list = []
-            state_list = []
-            while min_node.parent != None:
-                action_list.append(min_node.action)
-                state_list.append(min_node.state)
-                min_node = min_node.parent
-            state_list.append(min_node.state)
-            # This visit is from goal to initial state, we need to reverse it
-            action_list.reverse()
-            state_list.reverse()
-            return action_list, state_list
-
-        # Find all the possible next movements based on current position
-        node_list = expand_node(min_node)
-        for node in node_list:
-            # For each move, we check if it is already visited before
-            node_hash = hash_state(node.state)
-            if node_hash not in explored_states:
-                # If this is a new state, add the node to queue and update
-                # explored states
-                explored_states.add(node_hash)
-                heapq.heappush(node_heap, node)
-
-        
-    
 if __name__ == "__main__":
-    # init_state = np.array([1,3,6,5,0,2,4,8,7]).reshape([3,3])
-    
-    start = timeit.default_timer()
 
-    # init_state = np.array([1,6,7,5,0,3,4,8,2]).reshape([3,3]) # 34
+    print("Welcome! This program can be used to find the solution for 8 puzzles.Please read the instruction below carefully to save more time trying around")
+    print("First step: please enter your 8 Puzzle initial state row by row, sperate the numbers by space, input zero as the place holder")
 
-    # init_state = np.array([0,7,2,4,6,1,3,5,8]).reshape([3,3]) #24
-    # init_state = np.array([7,1,2,4,8,5,6,3,0]).reshape([3,3]) # 20
-    init_state = np.array([1,6,7,5,0,3,4,8,2]).reshape([3,3]) # 16
-    # init_state = np.array([1,3,6,5,0,7,4,8,2]).reshape([3,3]) # 12
-    # init_state = np.array([1,3,6,5,0,2,4,7,8]).reshape([3,3]) # 8
-    # init_state = np.array([1,2,3,5,0,6,4,7,8]).reshape([3,3]) # 4
-    # init_state = np.array([1,2,3,4,5,6,0,7,8]).reshape([3,3]) # 2
+    for i in range(5):
+        print("Example input:  1 2 3 4 5 6 0 7 8 ")
+        print("INPUT YOUR 8 PUZZLES")
+        x = input().split(' ')
+        try:
+            puzzle_array = np.array(x).astype(int)
+        except ValueError:
+            print("The input is not recognized, please only input numbers. \n(The error may be caused by typing in characters (e.g. ,) by accident)")
+        else:
+            if check_puzzle_array(puzzle_array) < 0:
+                continue
+            
+            puzzle_array = puzzle_array.reshape(3,3)
+            print("The initial state for 8 puzzle you just typed in is:")
+            print(puzzle_array)
 
-    # print(hash_state(init_state))
-    action_res, state_res  = general_search(init_state,0)
-    print(action_res)
+            print("Select algorithm now, please type a integer, 0 or 1 or 2 \n(0) Uniform Cost Research \n(1) A* with Misplaced Tile heuristic \n(2) A* with the Manhattan Distance heuristic.")
+            x = input()
+            try:
+                method_i = int(x)
+            except ValueError:
+                print("Please only input 0 or 1 or 2")
+            print("-------  Start Searching  -------")
+            action_res, state_res  = general_search(puzzle_array, method_i)
 
-    stop = timeit.default_timer()
-    print('Time: ', stop - start) 
+            print("-------- Finshed Search   ------")
+            action_list = ["up", "down", "left","right"]
+            action_print = [action_list[a] for a in action_res]
+            print("You should do the following")
+            print(action_print)
+            print("In toal you will need {} steps".format(len(action_print)))
+            exit()
 
-    # init_state = np.array([1,3,6,5,0,2,4,8,7]).reshape([3,3])
-    
-    # print(misplaced_tile_dist(init_state))
-    # print(manhattan_dist(init_state))
+    print("Reach the maximum attempts, please restart the program")
+
