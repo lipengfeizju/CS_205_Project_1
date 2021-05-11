@@ -10,12 +10,35 @@ def misplaced_tile_dist(current_state):
     dist_array = current_state.flatten() - GOAL_STATE
     # In the result, the position where not equal to zero
     # means this tile is misplaced 
-    misplaced_num = 9 - np.where(dist_array == 0)[0].shape[0]
+    misplaced_num = np.where(dist_array != 0)[0].shape[0]
+
+    # If the position of 0 (place holder) is not correct, we minus 1
+    # Because we don't want to count the place holder's misplacement
     if current_state[2,2] != 0:
         misplaced_num -= 1
-    
+
     return misplaced_num
 
+def manhattan_dist(current_state):
+
+    # Similar to the misplaced_tile_dist, we fist calculate the dist_array
+    dist_array = current_state.flatten() - GOAL_STATE
+
+    # Decode the dist_array to dist_x and dist_y, for instance, now 6
+    # is in position 2, 6-2 = 4, floor(4/3) = 1, mod(4,3) = 1, then we 
+    # know 6 should be in the next column and next row, the total distance
+    # is 1+1 = 2
+    dist_x = np.floor(abs(dist_array)/3)
+    dist_y = np.remainder(abs(dist_array),3)
+    dist_sum = dist_x + dist_y
+
+    # Find the position of 0 and set the distance sum to zero, since we 
+    # don't want to count 0 
+    index_0 = np.where(current_state == 0) 
+    dist_sum[index_0[0][0] *3 + index_0[1][0]] = 0
+    
+    return int(np.sum(dist_sum))
+    
 def find_next_state(current_state):
 
     next_state_list = []
@@ -119,7 +142,7 @@ class Node(object):
             # raise NotImplementedError
         # 2 for A* with Manhattan Distance heuristic
         elif self.dist_metric == 2:
-            raise NotImplementedError
+            self.h_n = manhattan_dist(next_state)
         else:
             print("Please not hack into the program")
             raise NotImplementedError
@@ -176,3 +199,7 @@ if __name__ == "__main__":
     # print(hash_state(init_state))
     node_res = general_search(init_state,1)
     print(node_res.action)
+    # init_state = np.array([1,3,6,5,0,2,4,8,7]).reshape([3,3])
+    
+    # print(misplaced_tile_dist(init_state))
+    # print(manhattan_dist(init_state))
