@@ -20,7 +20,6 @@ def general_search(init_state, method, verbose = False):
     i = 0
     max_queue_len = 0
     while(1):
-        i += 1
         if len(node_heap) > max_queue_len: max_queue_len = len(node_heap)
         
         if len(node_heap) == 0:
@@ -58,28 +57,48 @@ def general_search(init_state, method, verbose = False):
                 # explored states
                 explored_states.add(node_hash)
                 heapq.heappush(node_heap, node)
+        i += 1
 
 def demo():      
     # init_state = np.array([1,3,6,5,0,2,4,8,7]).reshape([3,3])
     
     start = timeit.default_timer()
 
-    # init_state = np.array([1,6,7,5,0,3,4,8,2]).reshape([3,3]) # 34
-
-    # init_state = np.array([0,7,2,4,6,1,3,5,8]).reshape([3,3]) #24
+    # init_state = np.array([0,7,2,4,6,1,3,5,8]).reshape([3,3]) # 24
     # init_state = np.array([7,1,2,4,8,5,6,3,0]).reshape([3,3]) # 20
     init_state = np.array([1,6,7,5,0,3,4,8,2]).reshape([3,3]) # 16
     # init_state = np.array([1,3,6,5,0,7,4,8,2]).reshape([3,3]) # 12
     # init_state = np.array([1,3,6,5,0,2,4,7,8]).reshape([3,3]) # 8
     # init_state = np.array([1,2,3,5,0,6,4,7,8]).reshape([3,3]) # 4
     # init_state = np.array([1,2,3,4,5,6,0,7,8]).reshape([3,3]) # 2
-
+    # init_state = np.array([1,2,3,4,5,6,7,8,0]).reshape([3,3]) # 0
     # print(hash_state(init_state))
-    action_res, state_res  = general_search(init_state,1,verbose=True)
-    print(action_res)
 
-    stop = timeit.default_timer()
-    # print('Time: ', stop - start)
+    # action_res, state_res  = general_search(init_state,1,verbose=True)
+    print("The initial state for 8 puzzle is")
+    print(init_state)
+    
+    action_list = ["up", "down", "left","right"]
+    
+    print("\n------  Start Uniform Cost Search  ------")
+    action_res, state_res  = general_search(init_state,0)
+    action_print = [action_list[a] for a in action_res]
+    print("You should do the following")
+    print(action_print)
+    
+
+    print("\n------  Start A* with Misplaced Tile Heuristic  ------")
+    action_res, state_res  = general_search(init_state,1)
+    action_print = [action_list[a] for a in action_res]
+    print("You should do the following")
+    print(action_print)
+
+    print("\n------  Start A* with Mandattan Distance Heuristic  ------")
+    action_res, state_res  = general_search(init_state,2)
+    action_print = [action_list[a] for a in action_res]
+    print("You should do the following")
+    print(action_print)
+
 
 if __name__ == "__main__":
     demo()
