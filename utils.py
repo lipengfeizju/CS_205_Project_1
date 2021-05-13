@@ -22,21 +22,18 @@ def misplaced_tile_dist(current_state):
 def manhattan_dist(current_state):
 
     # Similar to the misplaced_tile_dist, we fist calculate the dist_array
-    dist_array = current_state.flatten() - GOAL_STATE
-
+    
+    current_order = np.argsort(current_state.flatten())[1:]
+    correct_order = range(8)
+    dist_array = abs(current_order - correct_order)
     # Decode the dist_array to dist_x and dist_y, for instance, now 6
     # is in position 2, 6-2 = 4, floor(4/3) = 1, mod(4,3) = 1, then we 
     # know 6 should be in the next column and next row, the total distance
     # is 1+1 = 2
-    dist_x = np.floor(abs(dist_array)/3)
-    dist_y = np.remainder(abs(dist_array),3)
-    dist_sum = dist_x + dist_y
+    dist_x = np.floor(dist_array/3)
+    dist_y = np.remainder(dist_array,3)
+    dist_sum = dist_x + dist_y    
 
-    # Find the position of 0 and set the distance sum to zero, since we 
-    # don't want to count 0 
-    index_0 = np.where(current_state == 0) 
-    dist_sum[index_0[0][0] *3 + index_0[1][0]] = 0
-    
     return int(np.sum(dist_sum))
     
 def find_next_state(current_state):
