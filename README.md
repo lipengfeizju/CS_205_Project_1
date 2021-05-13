@@ -11,6 +11,7 @@ If you want to customize the input, please type in
 ```shell
 python main.py
 ```
-And then follow the instructions.
+And then follow the instructions in the program. You will first input the initial state and then select the method you want to use. If you have any questions, please contact lipengfeizju@gmail.com
+
 
 
