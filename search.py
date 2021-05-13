@@ -77,7 +77,7 @@ def demo():
     # action_res, state_res  = general_search(init_state,1,verbose=True)
     print("The initial state for 8 puzzle is")
     print(init_state)
-    
+
     action_list = ["up", "down", "left","right"]
     
     print("\n------  Start Uniform Cost Search  ------")
@@ -88,13 +88,13 @@ def demo():
     
 
     print("\n------  Start A* with Misplaced Tile Heuristic  ------")
-    action_res, state_res  = general_search(init_state,1)
+    action_res, state_res  = general_search(init_state,1,verbose=False)
     action_print = [action_list[a] for a in action_res]
     print("You should do the following")
     print(action_print)
 
     print("\n------  Start A* with Mandattan Distance Heuristic  ------")
-    action_res, state_res  = general_search(init_state,2)
+    action_res, state_res  = general_search(init_state,2, verbose=False)
     action_print = [action_list[a] for a in action_res]
     print("You should do the following")
     print(action_print)
